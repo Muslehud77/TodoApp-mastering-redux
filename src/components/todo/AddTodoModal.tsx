@@ -10,50 +10,91 @@ import {
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
+import { FormEvent, useState } from "react";
+import { useAppDispatch } from "@/redux/hook";
+import { addTodo } from "@/redux/features/todoSlice";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
 
 
 const AddTodoModal = () => {
-  
+    const [isDialogOpen,setIsDialogOpen] = useState(false)
+
+    const dispatch = useAppDispatch()
+
+
+    const handleSubmit = (e:FormEvent<HTMLFormElement>)=>{
+        e.preventDefault()
+
+
+
+        const form = e.target as HTMLFormElement;
+        const task = {
+          title: (form.elements.namedItem("title") as HTMLInputElement).value,
+          description: (
+            form.elements.namedItem("description") as HTMLInputElement
+          ).value,
+          priority: (
+            form.elements.namedItem("priority") as HTMLInputElement
+          ).value || "Low",
+        };
+
+        
+        dispatch(addTodo(task));
+        setIsDialogOpen(false)
+        form.reset()
+
+    }
 
   return (
-    <Dialog>
+    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-primary-gradient text-lg ">Add todo</Button>
+        <Button
+          onClick={() => setIsDialogOpen(true)}
+          className="bg-primary-gradient text-lg "
+        >
+          Add todo
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Edit profile</DialogTitle>
+          <DialogTitle>Add todo</DialogTitle>
           <DialogDescription>
-            Make changes to your profile here. Click save when you're done.
+            Add the task that you want to finish!
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
+        <form onSubmit={handleSubmit} className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
-              Name
+            <Label htmlFor="title" className="text-right">
+              Title
             </Label>
-            <Input
-              id="name"
-              defaultValue="Pedro Duarte"
-              className="col-span-3"
-            />
+            <Input id="title" className="col-span-3" />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="username" className="text-right">
-              Username
+            <Label htmlFor="description" className="text-right">
+              Description
             </Label>
-            <Input
-              id="username"
-              defaultValue="@peduarte"
-              className="col-span-3"
-            />
-           
+            <Input id="description" className="col-span-3" />
           </div>
-        </div>
-        <DialogFooter>
-          <Button type="submit">Save changes</Button>
-        </DialogFooter>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="" className="text-right">
+              Priority
+            </Label>
+            <Select name="priority">
+              <SelectTrigger className="w-36">
+                <SelectValue  placeholder="Priority" />
+              </SelectTrigger>
+              <SelectContent >
+                <SelectItem value="Low">Low</SelectItem>
+                <SelectItem value="Medium">Medium</SelectItem>
+                <SelectItem value="High">High</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <DialogFooter className="mt-5">
+            <Button type="submit">Save Task</Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );
