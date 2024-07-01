@@ -11,40 +11,52 @@ import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { FormEvent, useState } from "react";
-import { useAppDispatch } from "@/redux/hook";
-import { addTodo } from "@/redux/features/todoSlice";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-
-
+// import { useAppDispatch } from "@/redux/hook";
+// import { addTodo } from "@/redux/features/todoSlice";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { useAddTodoMutation } from "@/redux/api/api";
 
 const AddTodoModal = () => {
-    const [isDialogOpen,setIsDialogOpen] = useState(false)
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+ 
+  //!for local state management
+  // const dispatch = useAppDispatch()
 
-    const dispatch = useAppDispatch()
+  //* for server
+  const [addTodoMutate, { data, isLoading, isError, isSuccess }] =
+    useAddTodoMutation();
 
+  console.log({ data, isLoading, isError, isSuccess });
 
-    const handleSubmit = (e:FormEvent<HTMLFormElement>)=>{
-        e.preventDefault()
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
+    const form = e.target as HTMLFormElement;
+    const task = {
+      title: (form.elements.namedItem("title") as HTMLInputElement).value,
+      description: (form.elements.namedItem("description") as HTMLInputElement)
+        .value,
+      priority:
+        (form.elements.namedItem("priority") as HTMLInputElement).value ||
+        "Low",
+      isCompleted: false,
+    };
 
+    //* for server
+   await addTodoMutate(task);
+    //!for local state management
+    // dispatch(addTodo(task));
+    
+    setIsDialogOpen(false);
 
-        const form = e.target as HTMLFormElement;
-        const task = {
-          title: (form.elements.namedItem("title") as HTMLInputElement).value,
-          description: (
-            form.elements.namedItem("description") as HTMLInputElement
-          ).value,
-          priority: (
-            form.elements.namedItem("priority") as HTMLInputElement
-          ).value || "Low",
-        };
-
-        
-        dispatch(addTodo(task));
-        setIsDialogOpen(false)
-        form.reset()
-
-    }
+    form.reset();
+  };
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -82,9 +94,9 @@ const AddTodoModal = () => {
             </Label>
             <Select name="priority">
               <SelectTrigger className="w-36">
-                <SelectValue  placeholder="Priority" />
+                <SelectValue placeholder="Priority" />
               </SelectTrigger>
-              <SelectContent >
+              <SelectContent>
                 <SelectItem value="Low">Low</SelectItem>
                 <SelectItem value="Medium">Medium</SelectItem>
                 <SelectItem value="High">High</SelectItem>
