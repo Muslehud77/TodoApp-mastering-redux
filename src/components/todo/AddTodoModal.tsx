@@ -24,15 +24,12 @@ import { useAddTodoMutation } from "@/redux/api/api";
 
 const AddTodoModal = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
- 
+
   //!for local state management
   // const dispatch = useAppDispatch()
 
   //* for server
-  const [addTodoMutate, { data, isLoading, isError, isSuccess }] =
-    useAddTodoMutation();
-
-  console.log({ data, isLoading, isError, isSuccess });
+  const [addTodoMutate] = useAddTodoMutation();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -49,10 +46,10 @@ const AddTodoModal = () => {
     };
 
     //* for server
-   await addTodoMutate(task);
+    await addTodoMutate(task);
     //!for local state management
     // dispatch(addTodo(task));
-    
+
     setIsDialogOpen(false);
 
     form.reset();

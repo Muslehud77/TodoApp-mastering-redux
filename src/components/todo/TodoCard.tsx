@@ -2,7 +2,7 @@
 import { TTodo, todoCompleted } from '@/redux/features/todoSlice';
 import { Button } from '../ui/button';
 import { useAppDispatch } from '@/redux/hook';
-import { useDeleteTodoMutation } from '@/redux/api/api';
+import { useDeleteTodoMutation, useEditTodoMutation } from '@/redux/api/api';
 
 
 type TTodoCardProps = {
@@ -15,15 +15,23 @@ const priority = todo.priority
 const dispatch = useAppDispatch()
 const [deleteTodo] = useDeleteTodoMutation()
 
-
+const [toggleCompleted] = useEditTodoMutation()
 
   return (
     <div
-      className={`${priority === "High" ? "bg-red-200" : priority === "Medium" ? "bg-yellow-100" : "bg-green-100" } shadow-md rounded-lg p-4 w-full mx-auto border`}
+      className={`${
+        priority === "High"
+          ? "bg-red-200"
+          : priority === "Medium"
+          ? "bg-yellow-100"
+          : "bg-green-100"
+      } shadow-md rounded-lg p-4 w-full mx-auto border`}
     >
       <div className="flex items-center justify-between mb-4">
         <input
-          onChange={() => dispatch(todoCompleted(todo.id as number))}
+          onChange={() =>
+            toggleCompleted({ ...todo, isCompleted: !todo.isCompleted })
+          }
           type="checkbox"
           className="form-checkbox h-5 w-5 text-blue-600"
           defaultChecked={todo.isCompleted}
@@ -37,7 +45,9 @@ const [deleteTodo] = useDeleteTodoMutation()
       <p className="text-gray-700 mb-4">{todo?.description || "Description"}</p>
       <div className="flex space-x-2">
         <Button
-          onClick={() => {deleteTodo(todo?._id)}}
+          onClick={() => {
+            deleteTodo(todo?._id);
+          }}
           variant="destructive"
         >
           <svg
